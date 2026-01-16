@@ -1,12 +1,18 @@
 from django.db import models
 from django.contrib.auth.models import User
 from PIL import Image
+import os
+from django.conf import settings
 
 
 class Profile(models.Model):
     """Модель профілю користувача"""
     user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="Користувач")
-    image = models.ImageField(default='default.jpg', upload_to='profile_pics', verbose_name="Аватар")
+    image = models.ImageField(
+        default='default.jpg',  # повинен лежати у MEDIA_ROOT
+        upload_to='profile_pics',
+        verbose_name="Аватар"
+    )
     bio = models.TextField(max_length=500, blank=True, verbose_name="Про себе")
 
     class Meta:
@@ -20,9 +26,9 @@ class Profile(models.Model):
         """Зменшуємо розмір зображення при збереженні"""
         super().save(*args, **kwargs)
 
-        img = Image.open(self.image.path)
-
-        if img.height > 300 or img.width > 300:
-            output_size = (300, 300)
-            img.thumbnail(output_size)
-            img.save(self.image.path)
+        # Перевірка чи файл існує
+        if self.image and os.path.exists(self.image.path):
+            img = Image.open(self.image.path)
+            if img.height > 300 or img.width > 300:
+                img.thumbnail((300, 300))
+                img.save(self.image.path)

@@ -1,0 +1,113 @@
+{% extends "blog/base.html" %}
+
+{% block content %}
+    <div class="post-card">
+        <div class="d-flex align-items-start mb-4">
+            <img src="{{ object.author.profile.image.url }}" class="profile-img me-3" alt="Avatar">
+            <div class="flex-grow-1">
+                <a href="{% url 'user-posts' object.author.username %}" class="text-decoration-none">
+                    <strong style="color: #667eea; font-size: 1.2rem;">
+                        <i class="fas fa-user-circle"></i> {{ object.author.username }}
+                    </strong>
+                </a>
+                <div class="text-muted">
+                    <i class="far fa-calendar-alt"></i> {{ object.date_posted|date:"d.m.Y H:i" }}
+                </div>
+            </div>
+            {% if object.author == user %}
+                <div class="d-flex gap-2">
+                    <a href="{% url 'post-update' object.id %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-edit"></i> Редагувати
+                    </a>
+                    <a href="{% url 'post-delete' object.id %}" class="btn btn-sm btn-outline-danger">
+                        <i class="fas fa-trash-alt"></i> Видалити
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        <h2 class="mb-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            {{ object.title }}
+        </h2>
+
+        <div style="white-space: pre-wrap; line-height: 1.8; color: #444; font-size: 1.05rem;">
+            {{ object.content }}
+        </div>
+
+        <hr class="my-4">
+
+        <div class="d-flex gap-4 text-muted">
+            <span><i class="fas fa-comments" style="color: #667eea;"></i> <strong>{{ comments.count }}</strong> коментарів</span>
+            <span><i class="fas fa-eye" style="color: #764ba2;"></i> <strong>142</strong> переглядів</span>
+            <span><i class="fas fa-heart" style="color: #f5576c;"></i> <strong>24</strong> вподобань</span>
+        </div>
+    </div>
+
+    <!-- Секція коментарів -->
+    <div class="comment-section">
+        <h5 class="mb-4">
+            <i class="fas fa-comments"></i> Коментарі ({{ comments.count }})
+        </h5>
+
+        {% if user.is_authenticated %}
+            <div class="post-card mb-4">
+                <form method="POST" action="{% url 'add-comment' object.id %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Залишити коментар</strong></label>
+                        {{ comment_form.content }}
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i> Додати коментар
+                    </button>
+                </form>
+            </div>
+        {% else %}
+            <div class="post-card text-center py-4 mb-4">
+                <i class="fas fa-lock" style="font-size: 2rem; color: #e0e0e0;"></i>
+                <p class="mt-3 mb-0">
+                    <a href="{% url 'login' %}" style="color: #667eea; font-weight: 600;">Увійдіть</a>,
+                    щоб залишити коментар.
+                </p>
+            </div>
+        {% endif %}
+
+        <!-- Список коментарів -->
+        {% for comment in comments %}
+            <div class="comment">
+                <div class="d-flex align-items-center mb-3">
+                    <img src="{{ comment.author.profile.image.url }}" class="profile-img me-3" alt="Avatar" style="width: 40px; height: 40px;">
+                    <div class="flex-grow-1">
+                        <strong style="color: #667eea;">
+                            <i class="fas fa-user"></i> {{ comment.author.username }}
+                        </strong>
+                        <div class="text-muted small">
+                            <i class="far fa-clock"></i> {{ comment.date_posted|date:"d.m.Y H:i" }}
+                        </div>
+                    </div>
+                    {% if comment.author == user %}
+                        <a href="{% url 'delete-comment' comment.id %}"
+                           class="btn btn-sm btn-outline-danger"
+                           onclick="return confirm('Видалити цей коментар?')">
+                            <i class="fas fa-times"></i> Видалити
+                        </a>
+                    {% endif %}
+                </div>
+                <p class="mb-0" style="white-space: pre-wrap; line-height: 1.6; color: #555;">
+                    {{ comment.content }}
+                </p>
+            </div>
+        {% empty %}
+            <div class="text-center py-5">
+                <i class="fas fa-comment-slash" style="font-size: 3rem; color: rgba(255,255,255,0.3);"></i>
+                <p class="mt-3 text-muted">Коментарів поки немає. Станьте першим!</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="mt-4">
+        <a href="{% url 'blog-home' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Назад до списку
+        </a>
+    </div>
+{% endblock %}

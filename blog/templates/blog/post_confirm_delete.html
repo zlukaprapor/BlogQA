@@ -1,0 +1,45 @@
+{% extends "blog/base.html" %}
+
+{% block content %}
+    <div class="post-card">
+        <div class="text-center mb-4">
+            <div style="width: 80px; height: 80px; margin: 0 auto; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 25px rgba(245, 87, 108, 0.3);">
+                <i class="fas fa-exclamation-triangle" style="font-size: 2.5rem; color: white;"></i>
+            </div>
+            <h2 class="mt-4" style="color: #f5576c;">
+                Видалити пост?
+            </h2>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="alert alert-warning" style="border-radius: 15px; border-left: 5px solid #f5576c;">
+                <h5><i class="fas fa-info-circle"></i> Підтвердження видалення</h5>
+                <p class="mb-2">Ви впевнені, що хочете видалити пост:</p>
+                <p class="mb-2"><strong>"{{ object.title }}"</strong></p>
+                <hr>
+                <p class="mb-0 text-danger">
+                    <i class="fas fa-exclamation-circle"></i> <strong>Увага!</strong> Цю дію не можна буде скасувати. Всі коментарі до цього поста також будуть видалені.
+                </p>
+            </div>
+
+            <div class="d-flex gap-2 justify-content-between">
+                <a href="{% url 'post-detail' object.id %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Скасувати
+                </a>
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash-alt"></i> Так, видалити назавжди
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="post-card mt-3" style="background: linear-gradient(135deg, rgba(240, 147, 251, 0.1) 0%, rgba(245, 87, 108, 0.1) 100%);">
+        <h6><i class="fas fa-lightbulb"></i> Замість видалення ви можете:</h6>
+        <ul class="text-muted mb-0">
+            <li><i class="fas fa-edit"></i> Відредагувати пост, якщо є помилки</li>
+            <li><i class="fas fa-archive"></i> Зберегти його як чернетку (функція в розробці)</li>
+            <li><i class="fas fa-share"></i> Поділитися з іншими перед видаленням</li>
+        </ul>
+    </div>
+{% endblock %}

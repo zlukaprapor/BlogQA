@@ -1,0 +1,67 @@
+{% extends "blog/base.html" %}
+
+{% block content %}
+    <div class="post-card">
+        <div class="text-center mb-4">
+            <i class="fas fa-pen-fancy" style="font-size: 3rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
+            <h2 class="mt-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                {% if object %}Редагувати пост{% else %}Новий пост{% endif %}
+            </h2>
+            <p class="text-muted">{% if object %}Внесіть зміни у ваш пост{% else %}Поділіться своїми думками з іншими{% endif %}</p>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            <fieldset>
+                <div class="mb-4">
+                    <label for="{{ form.title.id_for_label }}" class="form-label">
+                        <i class="fas fa-heading"></i> <strong>Заголовок</strong>
+                    </label>
+                    {{ form.title }}
+                    {% if form.title.errors %}
+                        <div class="text-danger mt-2">
+                            <i class="fas fa-exclamation-circle"></i> {{ form.title.errors }}
+                        </div>
+                    {% endif %}
+                    <small class="form-text text-muted">
+                        <i class="fas fa-lightbulb"></i> Придумайте цікавий заголовок, який привабить увагу
+                    </small>
+                </div>
+
+                <div class="mb-4">
+                    <label for="{{ form.content.id_for_label }}" class="form-label">
+                        <i class="fas fa-align-left"></i> <strong>Зміст</strong>
+                    </label>
+                    {{ form.content }}
+                    {% if form.content.errors %}
+                        <div class="text-danger mt-2">
+                            <i class="fas fa-exclamation-circle"></i> {{ form.content.errors }}
+                        </div>
+                    {% endif %}
+                    <small class="form-text text-muted">
+                        <i class="fas fa-info-circle"></i> Розкажіть свою історію детально
+                    </small>
+                </div>
+            </fieldset>
+
+            <div class="d-flex gap-2 justify-content-between">
+                <a href="{% url 'blog-home' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Скасувати
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-check"></i> {% if object %}Оновити{% else %}Опублікувати{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="post-card mt-3" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);">
+        <h6><i class="fas fa-lightbulb"></i> Поради для написання</h6>
+        <ul class="text-muted mb-0">
+            <li>Використовуйте чіткі та зрозумілі заголовки</li>
+            <li>Структуруйте текст для кращої читабельності</li>
+            <li>Додавайте особисті історії та приклади</li>
+            <li>Перевіряйте граматику перед публікацією</li>
+        </ul>
+    </div>
+{% endblock %}

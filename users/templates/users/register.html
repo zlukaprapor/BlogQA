@@ -1,0 +1,90 @@
+{% extends "blog/base.html" %}
+
+{% block content %}
+    <div class="post-card">
+        <div class="text-center mb-4">
+            <div style="width: 80px; height: 80px; margin: 0 auto; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);">
+                <i class="fas fa-user-plus" style="font-size: 2.5rem; color: white;"></i>
+            </div>
+            <h2 class="mt-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                Реєстрація
+            </h2>
+            <p class="text-muted">Приєднуйтесь до спільноти блогерів</p>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            <fieldset>
+                {% for field in form %}
+                    <div class="mb-4">
+                        <label for="{{ field.id_for_label }}" class="form-label">
+                            <strong>
+                                {% if field.name == 'username' %}
+                                    <i class="fas fa-user"></i>
+                                {% elif field.name == 'email' %}
+                                    <i class="fas fa-envelope"></i>
+                                {% else %}
+                                    <i class="fas fa-lock"></i>
+                                {% endif %}
+                                {{ field.label }}
+                            </strong>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+                                {% if field.name == 'username' %}
+                                    <i class="fas fa-user"></i>
+                                {% elif field.name == 'email' %}
+                                    <i class="fas fa-envelope"></i>
+                                {% else %}
+                                    <i class="fas fa-lock"></i>
+                                {% endif %}
+                            </span>
+                            <input type="{{ field.field.widget.input_type }}"
+                                   name="{{ field.name }}"
+                                   class="form-control {% if field.errors %}is-invalid{% endif %}"
+                                   id="{{ field.id_for_label }}"
+                                   {% if field.value %}value="{{ field.value }}"{% endif %}
+                                   required
+                                   style="border-left: none;">
+                        </div>
+                        {% if field.help_text %}
+                            <small class="form-text text-muted">
+                                <i class="fas fa-info-circle"></i> {{ field.help_text|safe }}
+                            </small>
+                        {% endif %}
+                        {% if field.errors %}
+                            <div class="text-danger mt-2">
+                                <i class="fas fa-exclamation-circle"></i> {{ field.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </fieldset>
+
+            <button type="submit" class="btn btn-primary w-100 btn-lg mb-3">
+                <i class="fas fa-user-plus"></i> Зареєструватися
+            </button>
+        </form>
+
+        <hr class="my-4">
+
+        <div class="text-center">
+            <p class="mb-0">
+                Вже є обліковий запис?
+                <a href="{% url 'login' %}" style="color: #667eea; font-weight: 600; text-decoration: none;">
+                    <i class="fas fa-sign-in-alt"></i> Увійти
+                </a>
+            </p>
+        </div>
+    </div>
+
+    <div class="post-card mt-3" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);">
+        <h6><i class="fas fa-shield-alt"></i> Чому варто приєднатися?</h6>
+        <ul class="text-muted mb-0">
+            <li><i class="fas fa-check text-success"></i> Створюйте та публікуйте власні пости</li>
+            <li><i class="fas fa-check text-success"></i> Коментуйте пости інших користувачів</li>
+            <li><i class="fas fa-check text-success"></i> Налаштовуйте свій профіль</li>
+            <li><i class="fas fa-check text-success"></i> Безкоштовно та безпечно</li>
+        </ul>
+    </div>
+{% endblock %}
