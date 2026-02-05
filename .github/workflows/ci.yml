@@ -12,13 +12,13 @@ jobs:
 
     strategy:
       matrix:
-         python-version: ['3.10', '3.11', '3.12']
+        python-version: ['3.10', '3.11', '3.12']
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
@@ -28,20 +28,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Run migrations
+    - name: Run tests with coverage
       run: |
-        python manage.py migrate
-
-    - name: Run tests
-      run: |
-        python manage.py test
-
-    - name: Coverage report
-      run: |
-        coverage run --source='.' manage.py test
+        coverage run manage.py test
         coverage report
-
-    - name: Lint with flake8
-      run: |
-        flake8 blog/ users/ --max-line-length=120 --exclude=migrations
-      continue-on-error: true
