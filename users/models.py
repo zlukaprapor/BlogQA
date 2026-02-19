@@ -6,11 +6,10 @@ import os
 
 class Profile(models.Model):
     """Модель профілю користувача"""
+
     user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="Користувач")
     image = models.ImageField(
-        default='default.jpg',  # повинен лежати у MEDIA_ROOT
-        upload_to='profile_pics',
-        verbose_name="Аватар"
+        default="default.jpg", upload_to="profile_pics", verbose_name="Аватар"  # повинен лежати у MEDIA_ROOT
     )
     bio = models.TextField(max_length=500, blank=True, verbose_name="Про себе")
 
@@ -19,7 +18,7 @@ class Profile(models.Model):
         verbose_name_plural = "Профілі"
 
     def __str__(self):
-        return f'Профіль {self.user.username}'
+        return f"Профіль {self.user.username}"
 
     def save(self, *args, **kwargs):
         """Зменшуємо розмір зображення при збереженні"""
