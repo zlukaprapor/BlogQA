@@ -4,15 +4,15 @@ blog/tests.py  — UNIT-тести для додатку blog
 Використовує: django.test.TestCase, unittest.mock (Mock/Spy/patch)
 """
 
-from django.test import TestCase, Client
-from django.contrib.auth.models import User
-from django.urls import reverse
-from django.utils import timezone
 from unittest.mock import patch
 
-from blog.models import Post, Comment
-from blog.forms import PostForm, CommentForm
+from django.contrib.auth.models import User
+from django.test import Client, TestCase
+from django.urls import reverse
+from django.utils import timezone
 
+from blog.forms import CommentForm, PostForm
+from blog.models import Comment, Post
 
 # ══════════════════════════════════════════════════════
 #  1. MODELS  — повне покриття (100%)

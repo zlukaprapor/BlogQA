@@ -5,14 +5,14 @@ users/tests.py — UNIT-тести для додатку users
 Використовує: django.test.TestCase, unittest.mock (Mock/Spy/patch)
 """
 
-from django.test import TestCase, Client
+from unittest.mock import MagicMock, patch
+
 from django.contrib.auth.models import User
+from django.test import Client, TestCase
 from django.urls import reverse
-from unittest.mock import patch, MagicMock
 
+from users.forms import ProfileUpdateForm, UserRegisterForm, UserUpdateForm
 from users.models import Profile
-from users.forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
-
 
 # ══════════════════════════════════════════════════════
 #  1. MODEL — Profile  (повне покриття 100%)
