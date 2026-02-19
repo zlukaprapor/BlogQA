@@ -12,8 +12,12 @@ class PostForm(forms.ModelForm):
             'content': 'Зміст',
         }
         widgets = {
-            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введіть заголовок'}),
-            'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 10, 'placeholder': 'Напишіть ваш пост...'}),
+            'title': forms.TextInput(
+                attrs={'class': 'form-control', 'placeholder': 'Введіть заголовок'}
+            ),
+            'content': forms.Textarea(
+                attrs={'class': 'form-control', 'rows': 10, 'placeholder': 'Напишіть ваш пост...'}
+            ),
         }
 
 

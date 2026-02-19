@@ -8,4 +8,4 @@ class UsersConfig(AppConfig):
 
     def ready(self):
         """Імпортуємо signals при запуску додатку"""
-        import users.signals
+        import users.signals  # noqa: F401
