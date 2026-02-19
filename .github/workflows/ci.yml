@@ -7,7 +7,11 @@ on:
     branches: [ master ]
 
 jobs:
+  # ─────────────────────────────────────────
+  # JOB 1: UNIT-тести + Coverage
+  # ─────────────────────────────────────────
   test:
+    name: "Tests & Coverage (Python ${{ matrix.python-version }})"
     runs-on: ubuntu-latest
 
     strategy:
@@ -16,12 +20,20 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
+
+    - name: Cache pip dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
 
     - name: Install dependencies
       run: |
@@ -30,5 +42,88 @@ jobs:
 
     - name: Run tests with coverage
       run: |
-        coverage run manage.py test
-        coverage report
+        coverage run --source='blog,users' manage.py test blog users --verbosity=2
+        coverage report -m
+        coverage xml -o coverage.xml
+
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report-py${{ matrix.python-version }}
+        path: coverage.xml
+
+  # ─────────────────────────────────────────
+  # JOB 2: Стиль коду — flake8 + isort + black
+  # ─────────────────────────────────────────
+  lint:
+    name: "Code Style (flake8 / black / isort)"
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install linting tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8==6.1.0 black==23.10.0 isort==5.12.0
+
+    - name: flake8 — PEP8 style check
+      run: |
+        flake8 blog/ users/ \
+          --max-line-length=119 \
+          --exclude=migrations \
+          --statistics \
+          --count
+
+    - name: black — code formatting check
+      run: |
+        black --check --diff --line-length=119 blog/ users/ \
+          --exclude='migrations'
+
+    - name: isort — import order check
+      run: |
+        isort --check-only --diff blog/ users/ \
+          --skip-glob='*/migrations/*'
+
+  # ─────────────────────────────────────────
+  # JOB 3: Якість коду — bandit (security)
+  # ─────────────────────────────────────────
+  quality:
+    name: "Code Quality (bandit security scan)"
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install bandit
+      run: |
+        python -m pip install --upgrade pip
+        pip install bandit==1.7.5
+
+    - name: bandit — security vulnerability scan
+      run: |
+        bandit -r blog/ users/ \
+          --exclude blog/migrations,users/migrations \
+          --severity-level medium \
+          --confidence-level medium \
+          -f txt \
+          -o bandit_report.txt || true
+        cat bandit_report.txt
+
+    - name: Upload bandit report
+      uses: actions/upload-artifact@v4
+      with:
+        name: bandit-security-report
+        path: bandit_report.txt
