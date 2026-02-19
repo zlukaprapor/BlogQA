@@ -30,8 +30,8 @@ class PostModelTest(TestCase):
 
     # __str__
     def test_str_returns_title(self):
-        # self.assertEqual(str(self.post), "Тестовий пост")
-        self.assertEqual(str(self.post), "WRONG")  # зломати навмисно
+        self.assertEqual(str(self.post), "Тестовий пост")
+
 
     # get_absolute_url
     def test_get_absolute_url_contains_pk(self):
