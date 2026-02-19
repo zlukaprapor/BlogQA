@@ -8,7 +8,7 @@ users/tests.py — UNIT-тести для додатку users
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from django.urls import reverse
-from unittest.mock import patch, MagicMock, call
+from unittest.mock import patch, MagicMock
 
 from users.models import Profile
 from users.forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
@@ -23,46 +23,37 @@ class ProfileModelTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='testuser', password='pass1234')
 
-    # сигнал автоматично створює Profile
     def test_profile_auto_created(self):
         self.assertTrue(hasattr(self.user, 'profile'))
         self.assertIsInstance(self.user.profile, Profile)
 
-    # OneToOne зв'язок
     def test_profile_linked_to_user(self):
         self.assertEqual(self.user.profile.user, self.user)
 
-    # __str__
     def test_str_format(self):
         self.assertEqual(str(self.user.profile), f'Профіль {self.user.username}')
 
-    # default image
     def test_default_image_name(self):
         self.assertEqual(self.user.profile.image.name, 'default.jpg')
 
-    # bio за замовчуванням порожній
     def test_bio_default_empty(self):
         self.assertEqual(self.user.profile.bio, '')
 
-    # bio можна заповнити
     def test_bio_can_be_set(self):
         self.user.profile.bio = 'Трохи про мене'
         self.user.profile.save()
         self.user.profile.refresh_from_db()
         self.assertEqual(self.user.profile.bio, 'Трохи про мене')
 
-    # один Profile на одного User
     def test_one_profile_per_user(self):
         count = Profile.objects.filter(user=self.user).count()
         self.assertEqual(count, 1)
 
-    # CASCADE: видалення User → видалення Profile
     def test_profile_deleted_with_user(self):
         user_id = self.user.pk
         self.user.delete()
         self.assertEqual(Profile.objects.filter(user_id=user_id).count(), 0)
 
-    # bio max_length = 500
     def test_bio_max_length(self):
         max_length = Profile._meta.get_field('bio').max_length
         self.assertEqual(max_length, 500)
@@ -74,20 +65,17 @@ class ProfileModelTest(TestCase):
 
 class ProfileSignalTest(TestCase):
 
-    # Інтеграційний: реальний сигнал → реальний Profile
     def test_signal_creates_profile_on_new_user(self):
         user = User.objects.create_user(username='newone', password='pass')
         self.assertTrue(Profile.objects.filter(user=user).exists())
 
-    # Сигнал не дублює Profile при повторному збереженні user
     def test_signal_no_duplicate_on_user_save(self):
         self.user = User.objects.create_user(username='saveagain', password='pass')
         self.user.first_name = 'Іван'
-        self.user.save()  # повторне збереження
+        self.user.save()
         count = Profile.objects.filter(user=self.user).count()
         self.assertEqual(count, 1)
 
-    # ── MOCK: ізольований тест функції сигналу ──
     @patch('users.signals.Profile')
     def test_signal_handler_calls_create_when_created(self, MockProfile):
         """Mock Profile.objects — без звернення до БД."""
@@ -218,7 +206,6 @@ class ProfileUpdateFormTest(TestCase):
             data={'bio': 'Розробник Django', 'image': ''},
             instance=profile,
         )
-        # image не обов'язкове — форма валідна з лише bio
         self.assertTrue(form.is_valid(), form.errors)
 
 
@@ -276,7 +263,6 @@ class RegisterViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'users/register.html')
 
-    # ── MOCK: перевіряємо що messages.success викликається ──
     @patch('users.views.messages')
     def test_success_message_sent_on_register(self, mock_messages):
         """Spy — перевіряємо виклик messages.success."""
@@ -288,7 +274,6 @@ class RegisterViewTest(TestCase):
         })
         mock_messages.success.assert_called_once()
 
-    # ── MOCK: ізолюємо форму повністю ──
     @patch('users.views.UserRegisterForm')
     def test_register_uses_user_register_form(self, MockForm):
         """Mock форми — перевіряємо що view використовує UserRegisterForm."""
@@ -354,7 +339,6 @@ class ProfileViewTest(TestCase):
         })
         self.assertEqual(response.status_code, 200)
 
-    # ── SPY: перевіряємо виклик messages.success ──
     @patch('users.views.messages')
     def test_success_message_on_profile_update(self, mock_messages):
         """Spy — перевіряємо messages.success при успішному оновленні."""

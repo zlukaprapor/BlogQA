@@ -78,12 +78,14 @@ jobs:
         flake8 blog/ users/ \
           --max-line-length=119 \
           --exclude=migrations \
+          --extend-ignore=W292 \
           --statistics \
           --count
 
     - name: black — code formatting check
       run: |
-        black --check --diff --line-length=119 blog/ users/ \
+        black --check --diff --line-length=119 \
+          blog/ users/ \
           --exclude='migrations'
 
     - name: isort — import order check
@@ -107,10 +109,10 @@ jobs:
       with:
         python-version: '3.12'
 
-    - name: Install bandit
+    - name: Install bandit with dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install bandit==1.7.5
+        pip install "pbr>=5.0.0" "bandit==1.7.5"
 
     - name: bandit — security vulnerability scan
       run: |

@@ -1,5 +1,5 @@
 """
-blog/tests.py — UNIT-тести для додатку blog
+blog/tests.py  — UNIT-тести для додатку blog
 Покриває: Post model, Comment model, PostForm, CommentForm, всі views
 Використовує: django.test.TestCase, unittest.mock (Mock/Spy/patch)
 """
@@ -8,7 +8,7 @@ from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils import timezone
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 from blog.models import Post, Comment
 from blog.forms import PostForm, CommentForm
@@ -307,7 +307,6 @@ class PostCreateViewTest(TestCase):
         self.client.post(reverse('post-create'), {'title': '', 'content': ''})
         self.assertEqual(Post.objects.count(), 0)
 
-    # ── MOCK: ізолюємо messages від реального request ──
     @patch('blog.views.messages')
     def test_success_message_sent(self, mock_messages):
         """Spy — перевіряємо що messages.success викликається при створенні поста."""
@@ -345,7 +344,6 @@ class PostUpdateViewTest(TestCase):
         response = self.client.get(reverse('post-update', kwargs={'pk': self.post.pk}))
         self.assertEqual(response.status_code, 302)
 
-    # ── MOCK: messages.success при оновленні ──
     @patch('blog.views.messages')
     def test_update_success_message(self, mock_messages):
         self.client.login(username='editor', password='pass')
@@ -441,7 +439,6 @@ class AddCommentViewTest(TestCase):
         )
         self.assertEqual(response.status_code, 404)
 
-    # ── MOCK: ізолюємо messages ──
     @patch('blog.views.messages')
     def test_success_message_on_comment(self, mock_messages):
         self.client.login(username='commenter', password='pass')
@@ -478,7 +475,6 @@ class DeleteCommentViewTest(TestCase):
         response = self.client.post(reverse('delete-comment', kwargs={'pk': self.comment.pk}))
         self.assertRedirects(response, reverse('post-detail', kwargs={'pk': self.post.pk}))
 
-    # ── MOCK: error message для чужого коментаря ──
     @patch('blog.views.messages')
     def test_error_message_for_wrong_user(self, mock_messages):
         self.client.login(username='alien', password='pass')
