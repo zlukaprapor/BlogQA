@@ -32,7 +32,6 @@ class PostModelTest(TestCase):
     def test_str_returns_title(self):
         self.assertEqual(str(self.post), "Тестовий пост")
 
-
     # get_absolute_url
     def test_get_absolute_url_contains_pk(self):
         url = self.post.get_absolute_url()
